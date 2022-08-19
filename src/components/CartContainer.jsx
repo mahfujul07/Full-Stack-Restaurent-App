@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiRefreshFill } from "react-icons/ri";
-
+import StripeCheckout from "react-stripe-checkout";
 import { motion } from "framer-motion";
 import { useStateValue } from "../context/StateProvider";
 import { actionType } from "../context/reducer";
@@ -35,6 +35,27 @@ const CartContainer = () => {
     });
 
     localStorage.setItem("cartItems", JSON.stringify([]));
+  };
+
+  const makePayment = token => {
+    const body = {
+      token, 
+      CartItem
+    }
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    return fetch(`http://localhost:6969/payment`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body)
+    }).then(response => {
+      console.log("RESPONSE ", response)
+      const { status } = response;
+      console.log("STATUS ", status)
+    })
+    .catch(error => console.log(error));
+
   };
 
   return (
@@ -85,7 +106,7 @@ const CartContainer = () => {
             </div>
             <div className="w-full flex items-center justify-between">
               <p className="text-gray-400 text-lg">Delivery</p>
-              <p className="text-gray-400 text-lg">$ 2.5</p>
+              <p className="text-gray-400 text-lg">Free</p>
             </div>
 
             <div className="w-full border-b border-gray-600 my-2"></div>
@@ -93,9 +114,11 @@ const CartContainer = () => {
             <div className="w-full flex items-center justify-between">
               <p className="text-gray-200 text-xl font-semibold">Total</p>
               <p className="text-gray-200 text-xl font-semibold">
-                ${tot + 2.5}
+                ${tot}
               </p>
             </div>
+
+            <StripeCheckout stripeKey="pk_test_51LYXtQGgkzNQwuvYdVgvpz6gCRYOsuxcSWiNI0x2c981ira8740EBxXWMgoWW2GExNs4bjjLf2qDJ87q5MH5tL1s00LuuQYTKl" token={makePayment} name={cartItems} amount={tot * 100} shippingAddress billingAddress>
 
             {user ? (
               <motion.button
@@ -114,6 +137,10 @@ const CartContainer = () => {
                 Login to check out
               </motion.button>
             )}
+            
+            </StripeCheckout>
+
+
           </div>
         </div>
       ) : (
