@@ -88,7 +88,7 @@ const CreateContainer = () => {
   const saveDetails = () => {
     setIsLoading(true);
     try {
-      if (!title || !calories || !imageAsset || !price || !category) {
+      if (!title || !calories || !imageAsset || !price) {
         setFields(true);
         setMsg("Required fields can't be empty");
         setAlertStatus("danger");
